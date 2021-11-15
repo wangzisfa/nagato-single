@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.nagatosingle.dao.UserMapper">
+    <resultMap id="AuthUserMapper" type="com.github.nagatosingle.entity.NagatoAuthUser">
+        <result property="username" column="client_id"/>
+        <result property="password" column="client_secret"/>
+<!--        <result property="" column=""/>-->
+<!--        <result property="" column=""/>-->
+<!--        <result property="" column=""/>-->
+    </resultMap>
+
+
+    <select id="findAuthUserByUsername" resultMap="AuthUserMapper">
+        select client_id, client_secret
+        from oauth_client_details
+        where client_id = #{username}
+    </select>
+</mapper>
