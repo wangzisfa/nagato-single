@@ -12,4 +12,5 @@ import com.github.nagatosingle.entity.response.NagatoResponseEntity;
  */
 public interface UserService {
     NagatoResponseEntity findByUsername(String username);
+    NagatoResponseEntity getUserDetailInfoByUserGenerated(String uuid);
 }

@@ -58,10 +58,7 @@ public class NagatoSecurityConfigure extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().disable()
-                .formLogin().disable();
-        http.requestMatchers().anyRequest()
-                .and()
+        http
                 .authorizeRequests()
                 .antMatchers("/oauth/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
@@ -69,6 +66,8 @@ public class NagatoSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .antMatchers("/basic/**").permitAll()
                 .antMatchers("/platform/**").authenticated()
                 .and()
+                .httpBasic().disable()
+                .formLogin().disable()
                 .csrf().disable()
                 .cors();
     }

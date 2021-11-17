@@ -67,10 +67,10 @@ public class NagatoRedisConfigure {
 //        return template;
 //    }
     
-    @Bean
-    public RedisService redisService() {
-        return new RedisService();
-    }
+//    @Bean
+//    public RedisService redisService() {
+//        return new RedisService();
+//    }
     
     
     /**

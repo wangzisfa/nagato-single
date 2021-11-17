@@ -1,12 +1,20 @@
 package com.github.nagatosingle.service;
 
 
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,11 +25,45 @@ import java.util.concurrent.TimeUnit;
  * @Description:
  */
 @SuppressWarnings("all")
+@Service
 public class RedisService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Random codeGenerator = new Random();
+    private final Duration verificationCodeExpireTime;
+    private final Duration verificationCodeMinSendInterval;
+    
+    public RedisService(
+            @Qualifier("verificationCodeExpireTime")
+                    Duration verificationCodeExpireTime,
+            @Qualifier("verificationCodeMinSendInterval")
+                    Duration verificationCodeMinSendInterval
+    ) {
+        this.verificationCodeExpireTime = verificationCodeExpireTime;
+        this.verificationCodeMinSendInterval = verificationCodeMinSendInterval;
+    }
     
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    
+    public BoundValueOperations<String, Object> getAddress(String address) {
+        return redisTemplate.boundValueOps(address);
+    }
+    
+    public String verificationCode() {
+        return String.format("%06d", codeGenerator.nextInt(100000));
+    }
+    
+    public String getVerificationCode(String address) {
+        val ops = getAddress(address);
+        val code = verificationCode();
+        val now = Instant.now();
+        val res = ops.setIfAbsent(code + now.toString());
+        if (res == Boolean.TRUE) {
+            ops.expire(verificationCodeExpireTime);
+            return code;
+        }
+        return null;
+    }
     
     
     /**

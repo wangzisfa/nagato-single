@@ -4,7 +4,6 @@ import com.github.nagatosingle.constants.annotations.Manager;
 import com.github.nagatosingle.dao.UserMapper;
 import com.github.nagatosingle.entity.NagatoUserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Description:

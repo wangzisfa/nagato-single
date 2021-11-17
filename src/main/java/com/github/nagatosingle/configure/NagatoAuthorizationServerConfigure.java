@@ -106,12 +106,15 @@ public class NagatoAuthorizationServerConfigure extends AuthorizationServerConfi
                 .userDetailsService(userDetailsService)
                 .authenticationManager(authenticationManager)
                 .accessTokenConverter(jwtAccessTokenConverter());
+        
+//        这边通过捕获OAuth2异常拦截用户查询失败
+//        自定义的ExceptionHandler没法拦截到
         endpoints.exceptionTranslator(e -> {
             if (e instanceof OAuth2Exception) {
                 OAuth2Exception exception = (OAuth2Exception) e;
                 return ResponseEntity
                         .status(exception.getHttpErrorCode())
-                        .body(new CustomOAuth2Exception("bad credentials"));
+                        .body(new CustomOAuth2Exception("用户名或密码错误"));
             } else {
                 throw e;
             }

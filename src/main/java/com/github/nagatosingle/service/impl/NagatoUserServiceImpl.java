@@ -36,4 +36,16 @@ public class NagatoUserServiceImpl implements UserService {
         
         return null;
     }
+    
+    /**
+     * 主界面用户信息请求
+     * @param uuid 用户的uuid
+     * @return Response
+     */
+    @Override
+    public NagatoResponseEntity getUserDetailInfoByUserGenerated(String uuid) {
+        
+        
+        return null;
+    }
 }

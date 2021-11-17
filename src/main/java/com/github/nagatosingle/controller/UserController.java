@@ -5,11 +5,7 @@ import com.github.nagatosingle.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Description:
@@ -40,9 +36,13 @@ public class UserController {
         return new ResponseEntity<>(userService.findByUsername(username).getData(), HttpStatus.OK);
     }
     
-    @PostMapping("/dashboard")
-    public ResponseEntity<?> userDashboard() {
-        
+    /**
+     * 用户主界面请求信息
+     * @return ResponseEntity
+     */
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> userDashboard(@RequestParam("uuid") String uuid) {
+        System.out.println(userService.getUserDetailInfoByUserGenerated(uuid));
         
         return new ResponseEntity<>(HttpStatus.OK);
     }

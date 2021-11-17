@@ -3,6 +3,8 @@ package com.github.nagatosingle.entity;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * Description:
  * <p>
@@ -14,7 +16,21 @@ import lombok.Data;
 @Data
 @Builder
 public class NagatoUserProfile {
+    public String uuid;
     public String username;
+    public String realName;
+    public String password;
     public int gender;
     public String userIcon;
+    public String email;
+    public String userCurrentMood;
+    public String userSign;
+    public long userFaceId;
+    public double userCredit;
+    public boolean isInspector;
+    public int accessPropertyDevice;
+    public int accessPropertyLog;
+    public int accessPropertyUser;
+    public Date userCreate;
+    public Date userHireDate;
 }

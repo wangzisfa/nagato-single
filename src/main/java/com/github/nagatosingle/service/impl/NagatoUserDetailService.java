@@ -33,7 +33,9 @@ public class NagatoUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         NagatoAuthUser user = userMapper.findAuthUserByUsername(username);
+        System.out.println("经过这里");
         if (user == null) {
+            System.out.println("用户不存在");
             throw new UsernameNotFoundException("当前用户名不存在或密码错误");
         } else {
             System.out.println(user.getPassword());

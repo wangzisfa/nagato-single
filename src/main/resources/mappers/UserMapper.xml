@@ -17,4 +17,19 @@
         from oauth_client_details
         where client_id = #{username}
     </select>
+
+
+    <insert id="createUser" >
+        insert into nagato.nagato_plain_user(user_no_generate, user_nick)
+        values(#{user.uuid}, #{user.username});
+
+        insert into nagato.nagato_user_password(user_no, user_password)
+        values(
+                  (
+                      select user_no from nagato.nagato_plain_user
+                      where user_no_generate = #{user.uuid}
+                  ),
+                  #{user.password}
+              )
+    </insert>
 </mapper>

@@ -1,10 +1,9 @@
 package com.github.nagatosingle.controller;
 
+import com.github.nagatosingle.constants.ResponseMessage;
 import com.github.nagatosingle.entity.request.UserRegister;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import com.github.nagatosingle.service.interfaces.AccountService;
-import com.github.nagatosingle.service.interfaces.UserService;
-import com.github.nagatosingle.utils.UserUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +28,22 @@ import javax.servlet.http.HttpServletRequest;
 public class AccountController {
     @Autowired
     private AccountService accountService;
-    @Autowired
-    private UserUtils userUtils;
 //    @Autowired
 //    private NagatoRedisClientDetailService redisClientDetailService;
     private ConsumerTokenServices consumerTokenServices;
     
+    /**
+     * 添加用户
+     * 实际上应该从后台添加, 不设置注册界面
+     * @param userRegister 用户注册信息
+     * @return ResponseEntity
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(UserRegister userRegister) {
-        return userUtils.userRegisterCheck(userRegister) &&
-                accountService.createUser(userRegister).get("data").equals(true) ?
-                new ResponseEntity<>(HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        NagatoResponseEntity response = accountService.createUser(userRegister);
+        return StringUtils.equals(response.getMessage(), ResponseMessage.OK)?
+                new ResponseEntity<>(response, HttpStatus.OK) :
+                new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
     
     @GetMapping("/logout")
@@ -86,6 +89,12 @@ public class AccountController {
     
     @PostMapping("/updateUserIcon")
     public ResponseEntity<?> updateUserIcon() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    @PostMapping("/addUser")
+    public ResponseEntity<?> addUser() {
+        
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
