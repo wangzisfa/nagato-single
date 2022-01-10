@@ -17,5 +17,10 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     NagatoAuthUser findAuthUserByUsername(String username);
     NagatoUserProfile findUserProfileByUsername(String username);
+    int findUserNoByUsername(String username);
+    int findUserNoByUserNoGenerate(String userNoGenerate);
+    String findUserPasswordByUserNo(long userNo);
+    String findUserNoGenerateByUserNo(long userNo);
+    String findUserNameByUserNo(long userNo);
     void createUser(NagatoUserProfile user);
 }

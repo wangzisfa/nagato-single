@@ -1,7 +1,6 @@
 package com.github.nagatosingle.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.nagatosingle.entity.request.UserRegister;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import com.github.nagatosingle.manager.NagatoUserManager;
 import com.github.nagatosingle.service.interfaces.UserService;

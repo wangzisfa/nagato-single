@@ -1,4 +1,6 @@
 package com.github.nagatosingle.entity.response;
+import com.github.nagatosingle.constants.ResponseCode;
+
 import java.util.HashMap;
 
 /**
@@ -21,6 +23,11 @@ public class NagatoResponseEntity extends HashMap<String, Object> {
         this.put("data", data);
         return this;
     }
+
+    public NagatoResponseEntity code(ResponseCode code) {
+        this.put("statusCode", code);
+        return this;
+    }
     
     public String getMessage() {
         return String.valueOf(this.get("message"));
@@ -28,6 +35,10 @@ public class NagatoResponseEntity extends HashMap<String, Object> {
     
     public Object getData() {
         return this.get("data");
+    }
+
+    public ResponseCode getCode() {
+        return (ResponseCode) this.get("statusCode");
     }
     
     @Override

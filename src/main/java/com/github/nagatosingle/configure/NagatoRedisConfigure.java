@@ -107,4 +107,5 @@ public class NagatoRedisConfigure {
     public ChannelTopic topic() {
         return new ChannelTopic(REDIS_CHANNEL_NAME);
     }
+
 }

@@ -1,17 +1,11 @@
 package com.github.nagatosingle.configure;
 
-import org.apache.catalina.filters.CorsFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import com.github.nagatosingle.utils.jwt.JwtTokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * Description:
@@ -31,5 +25,20 @@ public class NagatoWebMvcConfigurer implements WebMvcConfigurer {
                 .allowedOriginPatterns("*")
                 .allowedMethods("*");
     }
-    
+
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new NagatoAuthInterceptor());
+    }
+
+    @Bean
+    public NagatoAuthInterceptor nagatoAuthInterceptor() {
+        return new NagatoAuthInterceptor();
+    }
+
+    @Bean
+    public JwtTokenService jwtTokenService() {
+        return new JwtTokenService();
+    }
 }

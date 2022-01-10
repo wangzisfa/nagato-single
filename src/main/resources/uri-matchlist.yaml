@@ -1,0 +1,11 @@
+visitor:
+  allowed:
+    - "/basic/*"
+#  banned:
+#    - "/platform/*"
+#    - "/py/*"
+user:
+  allowed:
+    - "asdf"
+#  banned:
+#    - "asdfa"

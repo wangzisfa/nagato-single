@@ -1,5 +1,6 @@
 package com.github.nagatosingle.service.interfaces;
 
+import com.github.nagatosingle.entity.request.UserLogin;
 import com.github.nagatosingle.entity.request.UserRegister;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,8 @@ import org.springframework.http.ResponseEntity;
  */
 public interface AccountService {
     NagatoResponseEntity createUser(UserRegister user);
-    NagatoResponseEntity validateUser();
-    NagatoResponseEntity invalidateUser();
+    NagatoResponseEntity validateUser(UserLogin user);
+    NagatoResponseEntity invalidateUser(String token);
     NagatoResponseEntity passwordRetrieve();
     NagatoResponseEntity changePassword();
     NagatoResponseEntity createVerificationCode();

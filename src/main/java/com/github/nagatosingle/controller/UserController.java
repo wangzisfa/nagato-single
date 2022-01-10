@@ -1,6 +1,5 @@
 package com.github.nagatosingle.controller;
 
-import com.github.nagatosingle.entity.NagatoUserProfile;
 import com.github.nagatosingle.service.interfaces.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

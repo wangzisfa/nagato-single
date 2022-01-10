@@ -14,6 +14,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UserLogin {
+    public String userNoGenerate;
     public String username;
     public String password;
 }

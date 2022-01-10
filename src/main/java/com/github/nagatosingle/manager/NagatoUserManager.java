@@ -3,6 +3,7 @@ package com.github.nagatosingle.manager;
 import com.github.nagatosingle.constants.annotations.Manager;
 import com.github.nagatosingle.dao.UserMapper;
 import com.github.nagatosingle.entity.NagatoUserProfile;
+import com.github.nagatosingle.entity.request.UserLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

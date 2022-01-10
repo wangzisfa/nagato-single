@@ -1,9 +1,7 @@
 package com.github.nagatosingle.configure;
 
-import com.github.nagatosingle.exception.auth.CustomBadCredentialsException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -36,15 +34,15 @@ public class NagatoCorsFilter implements Filter {
         } else {
 //            bad credentials 异常捕获
             System.out.println("reqw" + req.getParameter("username"));
-    
-            try {
-                chain.doFilter(req, resp);
-        
-            } catch (Exception exception) {
-                System.out.println(exception.toString());
-                System.out.println("nimasile");
-                throw new CustomBadCredentialsException("用户名或密码错误");
-            }
+            chain.doFilter(req, resp);
+
+//            try {
+//
+//            } catch (Exception exception) {
+//                System.out.println(exception.toString());
+//                System.out.println("nimasile");
+//                throw new CustomBadCredentialsException("用户名或密码错误");
+//            }
         }
     }
 }
