@@ -13,8 +13,8 @@ import lombok.Data;
  */
 @Data
 @Builder
-public class UserRegister {
+public class UserLoginDTO {
+    public String uuid;
     public String username;
     public String password;
-    public String passwordConfirm;
 }

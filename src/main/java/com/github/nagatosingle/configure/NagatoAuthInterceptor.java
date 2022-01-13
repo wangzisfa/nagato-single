@@ -2,7 +2,7 @@ package com.github.nagatosingle.configure;
 
 
 import com.github.nagatosingle.utils.jwt.JwtTokenService;
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.core.io.ClassPathResource;
@@ -11,8 +11,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
-
+@Slf4j
 public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Autowired
 	private JwtTokenService tokenService;
@@ -23,29 +24,41 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String uri = request.getRequestURI();
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
+		
 		LinkedHashMap<String, Object> visitor = (LinkedHashMap<String, Object>) map.get("visitor");
 		LinkedHashMap<String, Object> user = (LinkedHashMap<String, Object>) map.get("user");
-		boolean permission = false;
-		ArrayList<String> allowed = new ArrayList<>();
+		boolean incomingRole = false;
+		AtomicReference<ArrayList<String>> allowed = new AtomicReference<>(new ArrayList<>());
 //		ArrayList<String> banned = new ArrayList<>();
-		if (request.getHeader("Authorization") != null) {
-			//validate token
-			// if validated then permission = true
-			permission = tokenService.validateToken(request.getHeader("Authorization"));
-		}
-
-		if (permission) {
+//		if (request.getHeader("Authorization") != null) {
+//			//validate token
+//			// if validated then incomingRole = true
+//			incomingRole = tokenService.validateToken(request.getHeader("Authorization"));
+//		}
+		
+		if (request.getHeader("Authorization") != null)
+			incomingRole = true;
+		if (incomingRole) {
 			user.forEach((k, v) -> {
-				if (k.equals("allowed")) allowed.add((String) v);
+				if (k.equals("allowed"))
+					allowed.set((ArrayList<String>) v);
 			});
 		} else {
 			visitor.forEach((k, v) -> {
-				if (k.equals("allowed")) allowed.add((String) v);
+				if (k.equals("allowed"))
+					allowed.set((ArrayList<String>) v);
 			});
 		}
-
-		return allowed.contains(uri);
+		
+		
+		if (allowed.get().contains(uri)) {
+			return true;
+		} else {
+			if (request.getHeader("Authorization") != null)
+				return tokenService.validateToken(request.getHeader("Authorization"));
+			else return false;
+		}
 	}
 
 

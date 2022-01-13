@@ -1,11 +1,13 @@
 visitor:
   allowed:
     - "/basic/*"
+    - "/platform/account/register"
+    - "/platform/account/login"
 #  banned:
 #    - "/platform/*"
 #    - "/py/*"
 user:
   allowed:
-    - "asdf"
+    - "/platform/account/logout"
 #  banned:
 #    - "asdfa"

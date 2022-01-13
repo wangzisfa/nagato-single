@@ -1,9 +1,11 @@
 package com.github.nagatosingle.dao;
 
 import com.github.nagatosingle.entity.NagatoAuthUser;
+import com.github.nagatosingle.entity.NagatoRegisterProfile;
 import com.github.nagatosingle.entity.NagatoUserProfile;
-import com.github.nagatosingle.entity.request.UserRegister;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.math.BigInteger;
 
 /**
  * Description:
@@ -17,10 +19,12 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     NagatoAuthUser findAuthUserByUsername(String username);
     NagatoUserProfile findUserProfileByUsername(String username);
-    int findUserNoByUsername(String username);
-    int findUserNoByUserNoGenerate(String userNoGenerate);
-    String findUserPasswordByUserNo(long userNo);
-    String findUserNoGenerateByUserNo(long userNo);
-    String findUserNameByUserNo(long userNo);
-    void createUser(NagatoUserProfile user);
+    Integer findUserNoByUsername(String username);
+    Integer findUserNoByUserNoGenerate(String userNoGenerate);
+    String findUserPasswordByUserNo(Integer userNo);
+    String findUserNoGenerateByUserNo(Integer userNo);
+    String findUsernameByUserNo(Integer userNo);
+    Integer findUsernameValidation(String username);
+    Integer createPlainUser(NagatoRegisterProfile user);
+    void createUserPassword(NagatoRegisterProfile user);
 }

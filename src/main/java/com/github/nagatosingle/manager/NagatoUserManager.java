@@ -2,9 +2,11 @@ package com.github.nagatosingle.manager;
 
 import com.github.nagatosingle.constants.annotations.Manager;
 import com.github.nagatosingle.dao.UserMapper;
+import com.github.nagatosingle.entity.NagatoRegisterProfile;
 import com.github.nagatosingle.entity.NagatoUserProfile;
-import com.github.nagatosingle.entity.request.UserLogin;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigInteger;
 
 /**
  * Description:
@@ -21,6 +23,15 @@ public class NagatoUserManager {
     
     
     public NagatoUserProfile getUserProfile(String username) {
+
+
         return userMapper.findUserProfileByUsername(username);
+    }
+
+    public void createAccount(NagatoRegisterProfile user) {
+        Integer userNo = userMapper.createPlainUser(user);
+        System.out.println(userNo + " asdfasdffff");
+        user.setUserNo(userNo);
+        userMapper.createUserPassword(user);
     }
 }

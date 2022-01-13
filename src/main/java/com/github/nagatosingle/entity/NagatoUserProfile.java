@@ -19,9 +19,9 @@ public class NagatoUserProfile {
     public String uuid;
     public String username;
     public String realName;
-    public String password;
+//    public String password;
     public int gender;
-    public String userIcon;
+    public String userIconURI;
     public String email;
     public String userCurrentMood;
     public String userSign;

@@ -233,13 +233,11 @@ create table nagato_plain_user
     user_no_generate       varchar(36)      default '0'               null,
     user_real_name         varchar(20)                                null,
     user_nick              varchar(20)                                null,
-    user_gender            int                                        null,
+    user_gender            enum ('M', 'F')                            null,
     user_hire_date         datetime                                   null,
     user_credit            decimal(3, 2)                              null,
     user_favorite_digit    int unsigned     default '0'               null,
     user_face_id           varchar(30)                                null,
-    user_sign              varchar(50)                                null,
-    user_email             varchar(50)                                null,
     user_current_mood      varchar(20)                                null,
     is_inspector           tinyint unsigned default '0'               null,
     access_property_device tinyint unsigned default '4'               null,
@@ -389,6 +387,38 @@ create index user_no
 create index list_no
     on nagato_todo_list (list_no);
 
+create table nagato_user_credit
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    user_no      bigint unsigned                    not null,
+    user_credit  decimal(3, 2)                      null,
+    gmt_create   datetime default CURRENT_TIMESTAMP null,
+    gmt_modified datetime                           null,
+    constraint nagato_user_credit_ibfk_1
+        foreign key (user_no) references nagato_plain_user (user_no)
+            on delete cascade
+);
+
+create index nagato_user_credit
+    on nagato_user_credit (user_no);
+
+create table nagato_user_email
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    user_no      bigint unsigned                    not null,
+    user_email   varchar(50)                        null,
+    gmt_create   datetime default CURRENT_TIMESTAMP null,
+    gmt_modified datetime                           null,
+    constraint nagato_user_email_ibfk_1
+        foreign key (user_no) references nagato_plain_user (user_no)
+            on delete cascade
+);
+
+create index nagato_user_email
+    on nagato_user_email (user_no);
+
 create table nagato_user_icon
 (
     id           bigint unsigned auto_increment
@@ -413,9 +443,9 @@ create table nagato_user_password
     id            bigint unsigned auto_increment
         primary key,
     user_no       bigint unsigned                    not null,
-    user_password varchar(50)                        not null,
     gmt_create    datetime default CURRENT_TIMESTAMP null,
     gmt_modified  datetime                           null,
+    user_password varchar(50)                        not null,
     constraint nagato_user_password_ibfk_1
         foreign key (user_no) references nagato_plain_user (user_no)
             on delete cascade
@@ -424,22 +454,36 @@ create table nagato_user_password
 create index user_no
     on nagato_user_password (user_no);
 
+create table nagato_user_sign
+(
+    id           bigint unsigned auto_increment
+        primary key,
+    user_no      bigint unsigned                    not null,
+    user_sign    varchar(50)                        null,
+    gmt_create   datetime default CURRENT_TIMESTAMP null,
+    gmt_modified datetime                           null,
+    constraint nagato_user_sign_ibfk_1
+        foreign key (user_no) references nagato_plain_user (user_no)
+            on delete cascade
+);
+
+create index nagato_user_sign
+    on nagato_user_sign (user_no);
+
 create table oauth_client_details
 (
-    client_id               varchar(255)  not null
+    client_id               varchar(256)  not null
         primary key,
-    resource_ids            varchar(255)  null,
-    client_secret           varchar(255)  not null,
-    scope                   varchar(255)  not null,
-    authorized_grant_types  varchar(255)  not null,
-    web_server_redirect_uri varchar(255)  null,
-    authorities             varchar(255)  null,
-    access_token_validity   int           not null,
+    resource_ids            varchar(256)  null,
+    client_secret           varchar(256)  null,
+    scope                   varchar(256)  null,
+    authorized_grant_types  varchar(256)  null,
+    web_server_redirect_uri varchar(256)  null,
+    authorities             varchar(256)  null,
+    access_token_validity   int           null,
     refresh_token_validity  int           null,
     additional_information  varchar(4096) null,
-    autoapprove             tinyint       null,
-    origin_secret           varchar(255)  null
-)
-    comment '客户端配置表';
+    autoapprove             varchar(256)  null
+);
 
 

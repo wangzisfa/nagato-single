@@ -10,6 +10,24 @@
 <!--        <result property="" column=""/>-->
 <!--        <result property="" column=""/>-->
     </resultMap>
+    
+    <resultMap id="UserProfileMapper" type="com.github.nagatosingle.entity.NagatoUserProfile">
+        <id property="userNoGenerate" column="user_no_generate"/>
+        <result property="username" column="user_nick"/>
+        <result property="realName" column="user_real_name"/>
+        <result property="gender" column="user_gender"/>
+        <result property="userIcon" column="icon_url"/>
+        <result property="email" column="user_email" />
+        <result property="userSign" column="user_sign"/>
+        <result property="userFaceId" column="user_face_id"/>
+        <result property="userCredit" column="user_credit"/>
+        <result property="isInspector" column="is_inspector"/>
+        <result property="accessPropertyDevice" column="access_property_device"/>
+        <result property="accessPropertyLog" column="access_property_log"/>
+        <result property="accessPropertyUser" column="access_property_user"/>
+        <result property="userCreate" column="gmt_create"/>
+        <result property="userHireDate" column="user_hire_date"/>
+    </resultMap>
 
 
     <select id="findAuthUserByUsername" resultMap="AuthUserMapper">
@@ -18,18 +36,70 @@
         where client_id = #{username}
     </select>
 
+    <select id="findUserNoByUsername" resultType="java.lang.Integer">
+        select user_no from nagato.nagato_plain_user
+        where user_nick = #{username}
+    </select>
 
-    <insert id="createUser" >
-        insert into nagato.nagato_plain_user(user_no_generate, user_nick)
-        values(#{user.uuid}, #{user.username});
+    <select id="findUserNoByUserNoGenerate" resultType="java.lang.Integer">
+        select user_no from nagato.nagato_plain_user
+        where user_no_generate = #{userNoGenerate}
+    </select>
 
-        insert into nagato.nagato_user_password(user_no, user_password)
-        values(
-                  (
-                      select user_no from nagato.nagato_plain_user
-                      where user_no_generate = #{user.uuid}
-                  ),
-                  #{user.password}
-              )
+    <select id="findUserPasswordByUserNo" resultType="java.lang.String">
+        select user_password from nagato.nagato_user_password
+        where user_no = #{userNo}
+    </select>
+
+    <select id="findUserNoGenerateByUserNo" resultType="java.lang.String">
+        select user_no_generate from nagato.nagato_plain_user
+        where user_no = #{userNo}
+    </select>
+
+    <select id="findUsernameByUserNo" resultType="java.lang.String">
+        select user_nick from nagato.nagato_plain_user
+        where user_no = #{userNo}
+    </select>
+    
+    <select id="findUsernameValidation" resultType="java.lang.Integer">
+        select count(user_nick) from nagato.nagato_plain_user where user_nick = #{username}
+    </select>
+
+<!--主从表插入操作-->
+    <insert id="createPlainUser" parameterType="com.github.nagatosingle.entity.NagatoRegisterProfile" useGeneratedKeys="true" keyProperty="userNo" keyColumn="user_no">
+        insert into nagato_plain_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">
+                user_no_generate,
+            </if>
+            <if test="username != null" >
+                user_nick,
+            </if>
+            <if test="gender != null">
+                user_gender,
+            </if>
+            <if test="realName != null">
+                user_real_name
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uuid != null">
+                #{uuid},
+            </if>
+            <if test="username != null" >
+                #{username},
+            </if>
+            <if test="gender != null">
+                #{gender},
+            </if>
+            <if test="realName != null">
+                #{realName}
+            </if>
+        </trim>;
+    </insert>
+
+    <insert id="createUserPassword" parameterType="com.github.nagatosingle.entity.NagatoRegisterProfile">
+        insert into nagato_user_password(user_no, user_password)
+        values (#{userNo}, #{password});
     </insert>
 </mapper>

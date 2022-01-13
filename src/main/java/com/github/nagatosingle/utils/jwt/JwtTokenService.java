@@ -70,7 +70,7 @@ public class JwtTokenService {
 		if (hasExpiration) token = doGenerateToken(claims);
 		else token = doGenerateTokenNonExpiration(claims);
 
-		redisTemplate.boundHashOps("access-token").put(user.getUserNoGenerate(), token);
+		redisTemplate.boundHashOps("access-token").put(token, user.getUserNoGenerate());
 		return token;
 	}
 
