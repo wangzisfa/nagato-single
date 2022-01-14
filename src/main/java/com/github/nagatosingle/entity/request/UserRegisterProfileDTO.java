@@ -2,6 +2,7 @@ package com.github.nagatosingle.entity.request;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 /**
  * Description: 用户注册补充个人信息
@@ -19,4 +20,8 @@ public class UserRegisterProfileDTO {
     public String password;
     public String passwordConfirm;
     public String username;
+    @Nullable
+    public String phone;
+    @Nullable
+    public String verificationCode;
 }

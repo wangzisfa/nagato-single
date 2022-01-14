@@ -20,8 +20,8 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final String emailFrom;
     private final RedisService redisService;
-    
-    
+
+
     public MailService(
             JavaMailSender mailSender,
             @Qualifier("verificationCodeEmailFrom")
@@ -32,7 +32,7 @@ public class MailService {
         this.emailFrom = emailFrom;
         this.redisService = redisService;
     }
-    
+
     public boolean sendVerificationCode(String address) {
         val code = redisService.getVerificationCode(address);
         if (code == null) {

@@ -1,8 +1,11 @@
 package com.github.nagatosingle.configure;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.nagatosingle.utils.jwt.JwtTokenService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.core.io.ClassPathResource;
@@ -10,6 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -17,6 +21,14 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Autowired
 	private JwtTokenService tokenService;
+	private final LinkedHashMap<String, Object> visitor;
+	private final LinkedHashMap<String, Object> user;
+	public NagatoAuthInterceptor() {
+		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
+
+		this.visitor = (LinkedHashMap<String, Object>) map.get("visitor");
+		this.user = (LinkedHashMap<String, Object>) map.get("user");
+	}
 
 	//基于 URL 的登录拦截
 	//直接读配置文件中的url表
@@ -24,10 +36,10 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String uri = request.getRequestURI();
-		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
-		
-		LinkedHashMap<String, Object> visitor = (LinkedHashMap<String, Object>) map.get("visitor");
-		LinkedHashMap<String, Object> user = (LinkedHashMap<String, Object>) map.get("user");
+//		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
+//
+//		LinkedHashMap<String, Object> visitor = (LinkedHashMap<String, Object>) map.get("visitor");
+//		LinkedHashMap<String, Object> user = (LinkedHashMap<String, Object>) map.get("user");
 		boolean incomingRole = false;
 		AtomicReference<ArrayList<String>> allowed = new AtomicReference<>(new ArrayList<>());
 //		ArrayList<String> banned = new ArrayList<>();
@@ -50,15 +62,42 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 					allowed.set((ArrayList<String>) v);
 			});
 		}
-		
-		
-		if (allowed.get().contains(uri)) {
+
+//		allowed.get().contains(uri)
+		if (verifyUri(uri, allowed)) {
 			return true;
 		} else {
 			if (request.getHeader("Authorization") != null)
 				return tokenService.validateToken(request.getHeader("Authorization"));
-			else return false;
+			else {
+				response.setStatus(401);
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+
+				PrintWriter out = response.getWriter();
+				JSONObject obj = new JSONObject();
+				obj.put("message", "斯密马赛, 没有权限访问当前api");
+				out.print(obj);
+				out.flush();
+				return false;
+			}
 		}
+	}
+
+	private Boolean verifyUri(String uri, AtomicReference<ArrayList<String>> allowed) {
+		ArrayList<String> list = allowed.get();
+		for (String s : list) {
+			if (s.contains("*")) {
+				String parsed = s.substring(0, s.indexOf("*") - 1);
+				log.info("uri * parsed : " + parsed);
+				if (uri.contains(parsed)) {
+					return true;
+				}
+			} else if (StringUtils.equals(s, uri))
+				return true;
+		}
+
+		return false;
 	}
 
 

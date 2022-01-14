@@ -204,7 +204,29 @@
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <!--tencent cloud-->
+        <dependency>
+            <groupId>com.tencentcloudapi</groupId>
+            <artifactId>tencentcloud-sdk-java</artifactId>
+            <!-- go to https://search.maven.org/search?q=tencentcloud-sdk-java and get the latest version. -->
+            <!-- 请到https://search.maven.org/search?q=tencentcloud-sdk-java查询所有版本，最新版本如下 -->
+            <version>3.1.434</version>
+        </dependency>
 
+
+        <!--logback-->
+<!--        <dependency>-->
+<!--            <scope>compile</scope>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-classic</artifactId>-->
+<!--            <version>1.2.10</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <scope>compile</scope>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-core</artifactId>-->
+<!--            <version>1.2.10</version>-->
+<!--        </dependency>-->
 
     </dependencies>
 

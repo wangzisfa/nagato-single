@@ -3,6 +3,7 @@ visitor:
     - "/basic/*"
     - "/platform/account/register"
     - "/platform/account/login"
+    - "/platform/account/sendVerificationCode"
 #  banned:
 #    - "/platform/*"
 #    - "/py/*"

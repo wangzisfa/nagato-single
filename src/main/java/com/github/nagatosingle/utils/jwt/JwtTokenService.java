@@ -1,5 +1,6 @@
 package com.github.nagatosingle.utils.jwt;
 
+import com.github.nagatosingle.constants.RedisKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -51,7 +52,7 @@ public class JwtTokenService {
 	}
 
 	public Boolean validateToken(String token) {
-		String tokenInRedis = (String) redisTemplate.opsForHash().get("access-token", token);
+		String tokenInRedis = (String) redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN, token);
 		return tokenInRedis != null;
 //		Claims claims = getAllClaimsFromToken(token);
 //
@@ -70,7 +71,7 @@ public class JwtTokenService {
 		if (hasExpiration) token = doGenerateToken(claims);
 		else token = doGenerateTokenNonExpiration(claims);
 
-		redisTemplate.boundHashOps("access-token").put(token, user.getUserNoGenerate());
+		redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN).put(token, user.getUserNoGenerate());
 		return token;
 	}
 

@@ -2,6 +2,7 @@ package com.github.nagatosingle.service.impl;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.alibaba.fastjson.JSON;
+import com.github.nagatosingle.constants.RedisKey;
 import com.github.nagatosingle.constants.ResponseMessage;
 import com.github.nagatosingle.dao.UserMapper;
 import com.github.nagatosingle.entity.NagatoRegisterProfile;
@@ -10,6 +11,7 @@ import com.github.nagatosingle.entity.request.UserRegisterProfileDTO;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import com.github.nagatosingle.manager.NagatoUserManager;
 import com.github.nagatosingle.service.interfaces.AccountService;
+import com.github.nagatosingle.utils.SmsUtil;
 import com.github.nagatosingle.utils.jwt.JwtTokenService;
 import com.github.nagatosingle.utils.jwt.JwtUserDetail;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,10 @@ public class NagatoAccountServiceImpl implements AccountService {
         //email模块等待
         //当前用户权限写入
         //用户头像写入
+
+
+        // 验证码比对
+//        String redisCode = redisTemplate.opsForValue().get()
         
         //写入数据库
         NagatoRegisterProfile register = NagatoRegisterProfile.builder()
@@ -94,11 +100,13 @@ public class NagatoAccountServiceImpl implements AccountService {
 
     @Override
     public NagatoResponseEntity validateUser(UserLoginDTO userLoginDTO) {
-        //分为哪些步骤呢?
-        //用户名 密码验证, 验证成功就进入
-        //可以是用户名也可以是工号
-        //用户名合法性, 密码合法性
+        // 分为哪些步骤呢?
+        // 用户名 密码验证, 验证成功就进入
+        // 可以是用户名也可以是工号
+        // 用户名合法性, 密码合法性
         Integer userNo;
+
+        // 账户登录参数判断
         if (userLoginDTO.getUuid() == null) {
             userNo = mapper.findUserNoByUsername(userLoginDTO.getUsername());
             log.info(String.valueOf(userNo));
@@ -109,6 +117,8 @@ public class NagatoAccountServiceImpl implements AccountService {
             log.info(String.valueOf(userNo));
             userLoginDTO.setUsername(mapper.findUsernameByUserNo(userNo));
         }
+
+        // 查找比对密码
         String bcrypted = mapper.findUserPasswordByUserNo(userNo);
         log.info("user password : " + userLoginDTO.getPassword());
         char[] chars = userLoginDTO.getPassword().toCharArray();
@@ -132,7 +142,7 @@ public class NagatoAccountServiceImpl implements AccountService {
     
     @Override
     public NagatoResponseEntity invalidateUser(String token) {
-        redisTemplate.boundHashOps("access-token").delete(token);
+        redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN).delete(token);
 
         return new NagatoResponseEntity()
                 .message(ResponseMessage.OK);

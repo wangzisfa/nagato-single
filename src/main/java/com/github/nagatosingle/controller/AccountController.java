@@ -5,12 +5,15 @@ import com.github.nagatosingle.entity.request.UserLoginDTO;
 import com.github.nagatosingle.entity.request.UserRegisterProfileDTO;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import com.github.nagatosingle.service.interfaces.AccountService;
+import com.github.nagatosingle.utils.SmsUtil;
 import com.github.nagatosingle.utils.jwt.JwtTokenService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,11 +29,13 @@ import javax.servlet.http.HttpServletRequest;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/platform/account")
+@Slf4j
 public class AccountController {
 //    @Autowired
     private final AccountService accountService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final JwtTokenService jwtTokenService;
+    private final SmsUtil smsUtil;
 //    @Autowired
 //    private NagatoRedisClientDetailService redisClientDetailService;
 //    private ConsumerTokenServices consumerTokenServices;
@@ -42,9 +47,12 @@ public class AccountController {
      * @return ResponseEntity
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterProfileDTO userRegister) {
-        NagatoResponseEntity response = accountService.createUser(userRegister);
-        return returnStatement(response);
+    public ResponseEntity<?> register(@RequestBody UserRegisterProfileDTO userRegister, HttpServletRequest request) {
+        log.info("user phone : " + userRegister.getPhone());
+        log.info("user code : " + userRegister.getVerificationCode());
+        log.info("user ip : " + request.getRemoteAddr());
+//        NagatoResponseEntity response = accountService.createUser(userRegister);
+        return returnStatement(null);
     }
 
     /**
@@ -78,11 +86,14 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
-    @PostMapping("/sendVerificationCode")
-    public ResponseEntity<?> sendVerificationCode() {
-        
-        
-        return new ResponseEntity<>(HttpStatus.OK);
+    @GetMapping("/sendVerificationCode")
+    public ResponseEntity<?> sendVerificationCode(HttpServletRequest request) {
+        String number = request.getParameter("number");
+        String remoteAddress = request.getRemoteAddr();
+        if (number == null)
+            return new ResponseEntity<>(new NagatoResponseEntity().message(ResponseMessage.PARAMETER_NOT_MATCH),
+                    HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(smsUtil.sendSms(number, remoteAddress), HttpStatus.OK);
     }
     
     
@@ -106,8 +117,9 @@ public class AccountController {
     }
 
 
-    private ResponseEntity<?> returnStatement(NagatoResponseEntity response) {
-        return StringUtils.equals(response.getMessage(), ResponseMessage.OK) ?
+    private ResponseEntity<?> returnStatement(@Nullable NagatoResponseEntity response) {
+        return response == null ? new ResponseEntity<>(HttpStatus.OK) :
+                StringUtils.equals(response.getMessage(), ResponseMessage.OK) ?
                 new ResponseEntity<>(response, HttpStatus.OK) :
                 new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
