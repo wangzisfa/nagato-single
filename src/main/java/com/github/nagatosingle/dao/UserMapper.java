@@ -21,8 +21,10 @@ public interface UserMapper {
     NagatoUserProfile findUserProfileByUsername(String username);
     Integer findUserNoByUsername(String username);
     Integer findUserNoByUserNoGenerate(String userNoGenerate);
+    Integer findUserNoByUserPhone(String phone);
     String findUserPasswordByUserNo(Integer userNo);
     String findUserNoGenerateByUserNo(Integer userNo);
+    String findUserNoGenerateByPhone(String phone);
     String findUsernameByUserNo(Integer userNo);
     Integer findUsernameValidation(String username);
     Integer createPlainUser(NagatoRegisterProfile user);

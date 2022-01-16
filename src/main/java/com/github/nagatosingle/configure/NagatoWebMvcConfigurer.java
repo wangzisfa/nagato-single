@@ -29,7 +29,7 @@ public class NagatoWebMvcConfigurer implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new NagatoAuthInterceptor());
+        registry.addInterceptor(nagatoAuthInterceptor());
     }
 
     @Bean

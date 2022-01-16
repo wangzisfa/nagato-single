@@ -19,6 +19,7 @@ public class NagatoRegisterProfile {
 	public String password;
 //	public String passwordConfirm;
 	public String username;
+	public String phone;
 	public boolean isInspector;
 	public int accessPropertyDevice;
 	public int accessPropertyLog;

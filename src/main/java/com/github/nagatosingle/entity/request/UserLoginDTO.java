@@ -2,6 +2,7 @@ package com.github.nagatosingle.entity.request;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 
 /**
  * Description:
@@ -14,7 +15,11 @@ import lombok.Data;
 @Data
 @Builder
 public class UserLoginDTO {
+    @Nullable
     public String uuid;
+    @Nullable
+    public String phone;
+    @Nullable
     public String username;
     public String password;
 }

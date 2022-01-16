@@ -79,7 +79,12 @@ public class NagatoAccountServiceImpl implements AccountService {
 
 
         // 验证码比对
-//        String redisCode = redisTemplate.opsForValue().get()
+        assert user.getRemoteAddress() != null;
+        String redisCode = (String) redisTemplate.opsForValue().get(user.getRemoteAddress());
+        if (!SmsUtil.verify(redisCode, user.getVerificationCode())) {
+            return new NagatoResponseEntity()
+                    .message(ResponseMessage.SMS_VERIFICATION_CODE_NOT_MATCH);
+        }
         
         //写入数据库
         NagatoRegisterProfile register = NagatoRegisterProfile.builder()
@@ -88,6 +93,7 @@ public class NagatoAccountServiceImpl implements AccountService {
                 .realName(user.getRealName())
                 .gender(user.getGender())
                 .password(bcryptPassword)
+                .phone(user.getPhone())
                 .build();
 //        UserRegisterProfileDTO register = UserRegisterProfileDTO.builder()
 //                .username(user.getUsername())
@@ -99,36 +105,39 @@ public class NagatoAccountServiceImpl implements AccountService {
 
 
     @Override
-    public NagatoResponseEntity validateUser(UserLoginDTO userLoginDTO) {
+    public NagatoResponseEntity validateUser(UserLoginDTO user) {
         // 分为哪些步骤呢?
         // 用户名 密码验证, 验证成功就进入
         // 可以是用户名也可以是工号
         // 用户名合法性, 密码合法性
         Integer userNo;
 
-        // 账户登录参数判断
-        if (userLoginDTO.getUuid() == null) {
-            userNo = mapper.findUserNoByUsername(userLoginDTO.getUsername());
-            log.info(String.valueOf(userNo));
-            userLoginDTO.setUuid(mapper.findUserNoGenerateByUserNo(userNo));
+        // 参数兜底
+        if (user.getUsername() == null && user.getUuid() == null && user.getPhone() == null ) {
+            return new NagatoResponseEntity()
+                    .message(ResponseMessage.PARAMETER_NOT_MATCH);
         }
-        else {
-            userNo = mapper.findUserNoByUserNoGenerate(userLoginDTO.getUuid());
-            log.info(String.valueOf(userNo));
-            userLoginDTO.setUsername(mapper.findUsernameByUserNo(userNo));
+
+        // 账户登录参数判断
+        userNo = getUserLoginKey(user);
+
+        // 防止重复登录
+        if (redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN_REVERSE, user.getUuid()) != null) {
+            return new NagatoResponseEntity()
+                    .message(ResponseMessage.USER_ALREADY_LOGIN);
         }
 
         // 查找比对密码
         String bcrypted = mapper.findUserPasswordByUserNo(userNo);
-        log.info("user password : " + userLoginDTO.getPassword());
-        char[] chars = userLoginDTO.getPassword().toCharArray();
+        log.info("user password : " + user.getPassword());
+        char[] chars = user.getPassword().toCharArray();
         log.info("user password chars : " + Arrays.toString(chars));
         log.info("bcrypted : " + bcrypted);
-        BCrypt.Result r = BCrypt.verifyer().verify(userLoginDTO.getPassword().toCharArray(), bcrypted);
+        BCrypt.Result r = BCrypt.verifyer().verify(user.getPassword().toCharArray(), bcrypted);
         if (r.verified) {
             String token = tokenService.generateToken(JwtUserDetail.builder()
-                            .username(userLoginDTO.getUsername())
-                            .userNoGenerate(userLoginDTO.getUuid())
+                            .username(user.getUsername())
+                            .userNoGenerate(user.getUuid())
                             .build(),
                     true);
             return new NagatoResponseEntity()
@@ -138,6 +147,25 @@ public class NagatoAccountServiceImpl implements AccountService {
             return new NagatoResponseEntity()
                     .message(ResponseMessage.USER_NOT_FOUND);
         }
+    }
+
+    public Integer getUserLoginKey(UserLoginDTO user) {
+        Integer userNo;
+        if (user.getUsername() != null) {
+            userNo = mapper.findUserNoByUsername(user.getUsername());
+            log.info(String.valueOf(userNo));
+            user.setUuid(mapper.findUserNoGenerateByUserNo(userNo));
+        } else if (user.getUuid() != null) {
+            userNo = mapper.findUserNoByUserNoGenerate(user.getUuid());
+            log.info(String.valueOf(userNo));
+            user.setUsername(mapper.findUsernameByUserNo(userNo));
+        } else {
+            userNo = mapper.findUserNoByUserPhone(user.getPhone());
+            log.info(String.valueOf(user));
+            user.setUuid(mapper.findUserNoGenerateByPhone(user.getPhone()));
+        }
+
+        return userNo;
     }
     
     @Override

@@ -3,14 +3,18 @@ package com.github.nagatosingle.configure;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.nagatosingle.service.impl.NagatoAccountServiceImpl;
+import com.github.nagatosingle.service.interfaces.AccountService;
 import com.github.nagatosingle.utils.jwt.JwtTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.YamlMapFactoryBean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -21,13 +25,19 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Autowired
 	private JwtTokenService tokenService;
-	private final LinkedHashMap<String, Object> visitor;
-	private final LinkedHashMap<String, Object> user;
-	public NagatoAuthInterceptor() {
-		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
+	@Autowired
+	private RedisTemplate<String, Object> redisTemplate;
+	@Autowired
+	private NagatoAccountServiceImpl accountService;
+	public Map<String, Object> map;
+	public LinkedHashMap<String, Object> visitor;
+	public LinkedHashMap<String, Object> user;
 
-		this.visitor = (LinkedHashMap<String, Object>) map.get("visitor");
-		this.user = (LinkedHashMap<String, Object>) map.get("user");
+	@PostConstruct
+	public void init() {
+		map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
+		visitor = (LinkedHashMap<String, Object>) map.get("visitor");
+		user = (LinkedHashMap<String, Object>) map.get("user");
 	}
 
 	//基于 URL 的登录拦截
@@ -36,21 +46,51 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String uri = request.getRequestURI();
-//		Map<String, Object> map = yamlParserClassPathBased(new ClassPathResource("uri-matchlist.yaml"));
-//
-//		LinkedHashMap<String, Object> visitor = (LinkedHashMap<String, Object>) map.get("visitor");
-//		LinkedHashMap<String, Object> user = (LinkedHashMap<String, Object>) map.get("user");
-		boolean incomingRole = false;
-		AtomicReference<ArrayList<String>> allowed = new AtomicReference<>(new ArrayList<>());
+
+		AtomicReference<ArrayList<String>> allowed = allowedList(request, user, visitor);
 //		ArrayList<String> banned = new ArrayList<>();
 //		if (request.getHeader("Authorization") != null) {
 //			//validate token
 //			// if validated then incomingRole = true
 //			incomingRole = tokenService.validateToken(request.getHeader("Authorization"));
 //		}
-		
+
+
+//		allowed.get().contains(uri)
+		if (verifyUri(uri, allowed)) {
+			// 防止重复提交
+
+			return true;
+		} else {
+//			if (request.getHeader("Authorization") != null)
+//				return tokenService.validateToken(request.getHeader("Authorization"));
+//			else {
+				response.setStatus(401);
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+
+				PrintWriter out = response.getWriter();
+				JSONObject obj = new JSONObject();
+				obj.put("message", "斯密马赛, 没有权限访问当前api");
+				out.print(obj);
+				out.flush();
+				return false;
+		}
+	}
+
+
+	public AtomicReference<ArrayList<String>> allowedList(HttpServletRequest request,
+	                                                             LinkedHashMap<String, Object> user,
+	                                                             LinkedHashMap<String, Object> visitor) {
+		AtomicReference<ArrayList<String>> allowed = new AtomicReference<>();
+		boolean incomingRole = false;
 		if (request.getHeader("Authorization") != null)
-			incomingRole = true;
+//			incomingRole = true;
+			// 如果当前请求携带token, 先验证token合法性. 如果不合法直接返回**空队列**
+			if (tokenService.validateToken(request.getHeader("Authorization")))
+				incomingRole = true;
+			else
+				return allowed;
 		if (incomingRole) {
 			user.forEach((k, v) -> {
 				if (k.equals("allowed"))
@@ -63,29 +103,16 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 			});
 		}
 
-//		allowed.get().contains(uri)
-		if (verifyUri(uri, allowed)) {
-			return true;
-		} else {
-			if (request.getHeader("Authorization") != null)
-				return tokenService.validateToken(request.getHeader("Authorization"));
-			else {
-				response.setStatus(401);
-				response.setContentType("application/json");
-				response.setCharacterEncoding("UTF-8");
-
-				PrintWriter out = response.getWriter();
-				JSONObject obj = new JSONObject();
-				obj.put("message", "斯密马赛, 没有权限访问当前api");
-				out.print(obj);
-				out.flush();
-				return false;
-			}
-		}
+		return allowed;
 	}
 
+
 	private Boolean verifyUri(String uri, AtomicReference<ArrayList<String>> allowed) {
+		// 这里就是对如果token验证失败的特判
+		if (allowed.get() == null) return false;
 		ArrayList<String> list = allowed.get();
+		log.info("我list呢??" + String.valueOf(list));
+		log.info("uri是什么啊草 : " + uri);
 		for (String s : list) {
 			if (s.contains("*")) {
 				String parsed = s.substring(0, s.indexOf("*") - 1);
@@ -93,15 +120,17 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 				if (uri.contains(parsed)) {
 					return true;
 				}
-			} else if (StringUtils.equals(s, uri))
+			} else if (StringUtils.equals(s, uri)) {
+				log.info("uri passed");
 				return true;
+			}
 		}
 
 		return false;
 	}
 
 
-	private static Map<String, Object> yamlParserClassPathBased(ClassPathResource... classpath) {
+	public static Map<String, Object> yamlParserClassPathBased(ClassPathResource... classpath) {
 		YamlMapFactoryBean yaml = new YamlMapFactoryBean();
 		System.out.println(classpath.length);
 		if (classpath.length == 0)

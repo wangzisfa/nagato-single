@@ -51,8 +51,9 @@ public class AccountController {
         log.info("user phone : " + userRegister.getPhone());
         log.info("user code : " + userRegister.getVerificationCode());
         log.info("user ip : " + request.getRemoteAddr());
-//        NagatoResponseEntity response = accountService.createUser(userRegister);
-        return returnStatement(null);
+        userRegister.setRemoteAddress(request.getRemoteAddr());
+        NagatoResponseEntity response = accountService.createUser(userRegister);
+        return returnStatement(response);
     }
 
     /**
@@ -61,6 +62,7 @@ public class AccountController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
+        log.info(userLoginDTO.toString());
         NagatoResponseEntity response = accountService.validateUser(userLoginDTO);
         return returnStatement(response);
     }
@@ -118,7 +120,7 @@ public class AccountController {
 
 
     private ResponseEntity<?> returnStatement(@Nullable NagatoResponseEntity response) {
-        return response == null ? new ResponseEntity<>(HttpStatus.OK) :
+        return response == null ? new ResponseEntity<>("测试接口",HttpStatus.OK) :
                 StringUtils.equals(response.getMessage(), ResponseMessage.OK) ?
                 new ResponseEntity<>(response, HttpStatus.OK) :
                 new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

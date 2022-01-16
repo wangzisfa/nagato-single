@@ -24,4 +24,6 @@ public class UserRegisterProfileDTO {
     public String phone;
     @Nullable
     public String verificationCode;
+    @Nullable
+    public String remoteAddress;
 }

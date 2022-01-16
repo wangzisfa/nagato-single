@@ -4,14 +4,18 @@ import com.github.nagatosingle.constants.RedisKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -52,8 +56,16 @@ public class JwtTokenService {
 	}
 
 	public Boolean validateToken(String token) {
-		String tokenInRedis = (String) redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN, token);
-		return tokenInRedis != null;
+		HashOperations<String, String, String> ops = redisTemplate.opsForHash();
+		if (ops.hasKey(RedisKey.ACCESS_TOKEN, token)) {
+			String uuid = (String) redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN, token);
+			if (uuid != null && ops.hasKey(RedisKey.ACCESS_TOKEN_REVERSE, uuid)) {
+				String tokenInRedis = (String) redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN_REVERSE, uuid);
+				return StringUtils.equals(token, tokenInRedis);
+			}
+		}
+
+		return false;
 //		Claims claims = getAllClaimsFromToken(token);
 //
 //		return hasExpiration ? claims.get("id").equals(user.getUserNoGenerate()) &&
@@ -72,6 +84,7 @@ public class JwtTokenService {
 		else token = doGenerateTokenNonExpiration(claims);
 
 		redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN).put(token, user.getUserNoGenerate());
+		redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN_REVERSE).put(user.getUserNoGenerate(), token);
 		return token;
 	}
 
@@ -93,6 +106,28 @@ public class JwtTokenService {
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS256, secret)
 				.compact();
+
+	}
+
+	/**
+	 * 通过redis存一个{@code HashMap&lt;String, List&lt;String&gt;&gt;}
+	 * @param ip 当前用户ip
+	 * @param uri 当前访问接口
+	 * @return 可以通过访问 ? true : false
+	 */
+	public Boolean rateFilterAndJudge(String ip, String uri) {
+		BoundHashOperations<String, String, List<BlockMap<String, Date>>> putOps = redisTemplate.boundHashOps(RedisKey.RATE_FILTER);
+		HashOperations<String, String, List<BlockMap<String, Date>>> getOps = redisTemplate.opsForHash();
+		
+
+
+		return false;
+	}
+
+	@Data
+	private class BlockMap<K extends String, V extends Date> {
+		K uri;
+		V date;
 
 	}
 }

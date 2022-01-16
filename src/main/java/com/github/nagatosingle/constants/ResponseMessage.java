@@ -19,4 +19,6 @@ public enum ResponseMessage {
     public static final String SMS_ERROR = "短信服务状态异常";
     public static final String SMS_REDIS_KEY_NOT_EXPIRED = "当前ip持有验证码未过期";
     public static final String PARAMETER_NOT_MATCH = "当前请求参数不匹配";
+    public static final String SMS_VERIFICATION_CODE_NOT_MATCH = "验证码错误";
+    public static final String USER_ALREADY_LOGIN = "当前用户已登录";
 }

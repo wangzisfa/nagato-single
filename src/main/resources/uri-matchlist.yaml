@@ -10,5 +10,6 @@ visitor:
 user:
   allowed:
     - "/platform/account/logout"
+    - "/platform/device/*"
 #  banned:
 #    - "asdfa"

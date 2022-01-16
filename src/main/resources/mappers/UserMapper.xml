@@ -46,6 +46,11 @@
         where user_no_generate = #{userNoGenerate}
     </select>
 
+    <select id="findUserNoByUserPhone" resultType="java.lang.Integer">
+        select user_no from nagato.nagato_plain_user
+        where user_phone = #{phone}
+    </select>
+
     <select id="findUserPasswordByUserNo" resultType="java.lang.String">
         select user_password from nagato.nagato_user_password
         where user_no = #{userNo}
@@ -54,6 +59,11 @@
     <select id="findUserNoGenerateByUserNo" resultType="java.lang.String">
         select user_no_generate from nagato.nagato_plain_user
         where user_no = #{userNo}
+    </select>
+
+    <select id="findUserNoGenerateByPhone" resultType="java.lang.String">
+        select user_no_generate from nagato_plain_user
+        where user_phone = #{phone}
     </select>
 
     <select id="findUsernameByUserNo" resultType="java.lang.String">
@@ -79,7 +89,10 @@
                 user_gender,
             </if>
             <if test="realName != null">
-                user_real_name
+                user_real_name,
+            </if>
+            <if test="phone != null">
+                user_phone
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -93,7 +106,10 @@
                 #{gender},
             </if>
             <if test="realName != null">
-                #{realName}
+                #{realName},
+            </if>
+            <if test="phone != null">
+                #{phone}
             </if>
         </trim>;
     </insert>
