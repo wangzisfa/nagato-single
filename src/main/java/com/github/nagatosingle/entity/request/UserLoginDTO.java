@@ -16,6 +16,10 @@ import org.springframework.lang.Nullable;
 @Builder
 public class UserLoginDTO {
     @Nullable
+    public String remoteAddress;
+    @Nullable
+    public String verificationCode;
+    @Nullable
     public String uuid;
     @Nullable
     public String phone;

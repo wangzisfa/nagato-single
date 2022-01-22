@@ -94,7 +94,7 @@ public class SmsUtil {
 
 	private boolean uploadVerificationCode(String code , String remoteAddress) {
 		if (redisTemplate.opsForValue().get(remoteAddress) == null) {
-			redisTemplate.opsForValue().set(remoteAddress, code, 300, TimeUnit.SECONDS);
+			redisTemplate.opsForValue().set(remoteAddress, code, 60, TimeUnit.SECONDS);
 			return true;
 		}
 		return false;

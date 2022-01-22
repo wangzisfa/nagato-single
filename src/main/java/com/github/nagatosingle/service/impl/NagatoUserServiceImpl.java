@@ -1,6 +1,8 @@
 package com.github.nagatosingle.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.nagatosingle.constants.ResponseMessage;
+import com.github.nagatosingle.entity.NagatoUserProfile;
 import com.github.nagatosingle.entity.response.NagatoResponseEntity;
 import com.github.nagatosingle.manager.NagatoUserManager;
 import com.github.nagatosingle.service.interfaces.UserService;
@@ -25,15 +27,15 @@ public class NagatoUserServiceImpl implements UserService {
     
     /**
      * basic user profile
-     * @param username 用户名
+     * @param uuid uuid
      * @return Response
      */
     @Override
-    public NagatoResponseEntity findByUsername(String username) {
-        userManager.getUserProfile(username);
-        JSONObject jsonObject = new JSONObject();
-        
-        return null;
+    public NagatoResponseEntity findByUuid(String uuid) {
+
+        return new NagatoResponseEntity()
+                .data(userManager.getUserProfile(uuid))
+                .message(ResponseMessage.OK);
     }
     
     /**

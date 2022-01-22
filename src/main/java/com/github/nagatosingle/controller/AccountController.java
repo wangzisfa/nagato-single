@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.github.nagatosingle.controller.BaseController.returnStatement;
+
 /**
  * Description:
  * <p>
@@ -57,13 +59,26 @@ public class AccountController {
     }
 
     /**
-     * @param userLoginDTO 用户登录dto
+     * @param user 用户登录dto
      * @return 返回一个 access token
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
-        log.info(userLoginDTO.toString());
-        NagatoResponseEntity response = accountService.validateUser(userLoginDTO);
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO user) {
+        log.info(user.toString());
+        NagatoResponseEntity response = accountService.validateUser(user);
+        return returnStatement(response);
+    }
+
+    @PostMapping("/loginUseVerificationCode")
+    public ResponseEntity<?> loginUseVerificationCode(@RequestBody UserLoginDTO user, HttpServletRequest request) {
+        log.info(user.getVerificationCode());
+        if (user.getVerificationCode() == null || request.getRemoteAddr() == null)
+            return returnStatement(new NagatoResponseEntity()
+                    .message(ResponseMessage.PARAMETER_NOT_MATCH)
+            );
+
+        user.setRemoteAddress(request.getRemoteAddr());
+        NagatoResponseEntity response = accountService.validateUserVerificationCode(user);
         return returnStatement(response);
     }
     
@@ -119,10 +134,5 @@ public class AccountController {
     }
 
 
-    private ResponseEntity<?> returnStatement(@Nullable NagatoResponseEntity response) {
-        return response == null ? new ResponseEntity<>("测试接口",HttpStatus.OK) :
-                StringUtils.equals(response.getMessage(), ResponseMessage.OK) ?
-                new ResponseEntity<>(response, HttpStatus.OK) :
-                new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+
 }

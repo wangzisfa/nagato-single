@@ -5,8 +5,6 @@ import com.github.nagatosingle.entity.NagatoRegisterProfile;
 import com.github.nagatosingle.entity.NagatoUserProfile;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.math.BigInteger;
-
 /**
  * Description:
  * <p>
@@ -18,7 +16,7 @@ import java.math.BigInteger;
 @Mapper
 public interface UserMapper {
     NagatoAuthUser findAuthUserByUsername(String username);
-    NagatoUserProfile findUserProfileByUsername(String username);
+    NagatoUserProfile findUserProfileByUuid(String uuid);
     Integer findUserNoByUsername(String username);
     Integer findUserNoByUserNoGenerate(String userNoGenerate);
     Integer findUserNoByUserPhone(String phone);
@@ -28,5 +26,9 @@ public interface UserMapper {
     String findUsernameByUserNo(Integer userNo);
     Integer findUsernameValidation(String username);
     Integer createPlainUser(NagatoRegisterProfile user);
-    void createUserPassword(NagatoRegisterProfile user);
+    Integer createUserPassword(NagatoRegisterProfile user);
+    Integer createUserIconDefault(Integer userNo, String defaultURL);
+    Integer createUserCreditDefault(Integer userNo, Double defaultCredit);
+    Integer createUserSignDefault(Integer userNo, String defaultSign);
+    Integer createUserEmailDefault(Integer userNo);
 }

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Description:
@@ -14,23 +15,26 @@ import java.util.Date;
  * @version 0.31
  */
 @Data
-@Builder
 public class NagatoUserProfile {
     public String uuid;
     public String username;
     public String realName;
-//    public String password;
-    public int gender;
+    public String gender;
     public String userIconURI;
     public String email;
     public String userCurrentMood;
     public String userSign;
-    public long userFaceId;
+    public String userPhone;
+    public String userFaceId;
     public double userCredit;
-    public boolean isInspector;
+    public int isInspector;
     public int accessPropertyDevice;
     public int accessPropertyLog;
     public int accessPropertyUser;
     public Date userCreate;
     public Date userHireDate;
+    public List<NagatoDeviceDetail> userHoldingDevices;
+
+    public NagatoUserProfile() {
+    }
 }

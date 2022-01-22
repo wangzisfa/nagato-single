@@ -4,12 +4,15 @@ visitor:
     - "/platform/account/register"
     - "/platform/account/login"
     - "/platform/account/sendVerificationCode"
+    - "/platform/account/loginUseVerificationCode"
 #  banned:
 #    - "/platform/*"
 #    - "/py/*"
 user:
   allowed:
+    - "/basic/*"
     - "/platform/account/logout"
     - "/platform/device/*"
+    - "/platform/user/*"
 #  banned:
 #    - "asdfa"

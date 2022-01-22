@@ -24,13 +24,18 @@ import java.util.function.Function;
 public class JwtTokenService {
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
-	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+	// 7天
+	public static final long JWT_TOKEN_VALIDITY = 168 * 60 * 60;
 
 	@Value("${jwt.secret}")
 	private String secret;
 
 	public String getUsernameFromToken(String token) {
-		return getClaimFromToken(token, Claims::getSubject);
+		return (String) getClaimFromToken(token, claims -> claims.get("username"));
+	}
+
+	public String getUuidFromToken(String token) {
+		return (String) getClaimFromToken(token, claims -> claims.get("id"));
 	}
 
 	public Date getExpirationDateFromToken(String token) {

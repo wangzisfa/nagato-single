@@ -33,7 +33,7 @@ public class JwtTokenServiceTest {
 				.setExpiration(new Date(System.currentTimeMillis() + 100000000))
 				.signWith(SignatureAlgorithm.HS256, "wangzisfainusewithsuzumiyaharuhibackendservice")
 				.compact();
-
+		System.out.println(getClaimFromToken("eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IjRkYmM3YTZiYzAyYTQyYzA5NWZmZjAyNmJlOGIzZmE1IiwiZXhwIjoxNjQzMzg2NDYzLCJpYXQiOjE2NDI3ODE2NjMsInVzZXJuYW1lIjpudWxsfQ.xC9T32BnxYPal3Gzx4RRvnxcRjOiNP3MIXYm_LvUzzE", claims1 -> claims1.get("id")) + " this is id");
 		System.out.println(res);
 	}
 

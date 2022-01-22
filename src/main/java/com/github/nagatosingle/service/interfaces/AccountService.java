@@ -14,6 +14,7 @@ import com.github.nagatosingle.entity.response.NagatoResponseEntity;
  */
 public interface AccountService {
     NagatoResponseEntity createUser(UserRegisterProfileDTO user);
+    NagatoResponseEntity validateUserVerificationCode(UserLoginDTO user);
     NagatoResponseEntity validateUser(UserLoginDTO user);
     NagatoResponseEntity invalidateUser(String token);
     NagatoResponseEntity passwordRetrieve();

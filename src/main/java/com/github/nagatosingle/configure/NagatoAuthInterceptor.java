@@ -48,13 +48,20 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 		String uri = request.getRequestURI();
 
 		AtomicReference<ArrayList<String>> allowed = allowedList(request, user, visitor);
-//		ArrayList<String> banned = new ArrayList<>();
-//		if (request.getHeader("Authorization") != null) {
-//			//validate token
-//			// if validated then incomingRole = true
-//			incomingRole = tokenService.validateToken(request.getHeader("Authorization"));
-//		}
 
+		//validate token
+		if (allowed == null) {
+			response.setStatus(401);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			PrintWriter out = response.getWriter();
+			JSONObject obj = new JSONObject();
+			obj.put("message", "当前token不合法");
+			out.print(obj);
+			out.flush();
+			return false;
+		}
 
 //		allowed.get().contains(uri)
 		if (verifyUri(uri, allowed)) {
@@ -90,7 +97,7 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 			if (tokenService.validateToken(request.getHeader("Authorization")))
 				incomingRole = true;
 			else
-				return allowed;
+				return null;
 		if (incomingRole) {
 			user.forEach((k, v) -> {
 				if (k.equals("allowed"))

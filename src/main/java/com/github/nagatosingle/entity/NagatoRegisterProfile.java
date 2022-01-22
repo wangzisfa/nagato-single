@@ -4,7 +4,6 @@ package com.github.nagatosingle.entity;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
 
 @Data
 @Builder

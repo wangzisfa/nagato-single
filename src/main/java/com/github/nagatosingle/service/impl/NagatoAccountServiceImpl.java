@@ -103,6 +103,23 @@ public class NagatoAccountServiceImpl implements AccountService {
         return new NagatoResponseEntity().message(ResponseMessage.OK);
     }
 
+    @Override
+    public NagatoResponseEntity validateUserVerificationCode(UserLoginDTO user) {
+        String codeInRedis = (String) redisTemplate.opsForValue().get(user.getRemoteAddress());
+
+        if (StringUtils.equals(user.getVerificationCode(), codeInRedis)) {
+            // 验证成功后删除键
+            if (Boolean.TRUE.equals(redisTemplate.delete(user.getRemoteAddress())))
+                return new NagatoResponseEntity()
+                        .message(ResponseMessage.OK);
+            else
+                return new NagatoResponseEntity()
+                        .message(ResponseMessage.SERVER_ERROR);
+        }
+        return new NagatoResponseEntity()
+                .message(ResponseMessage.SMS_VERIFICATION_CODE_NOT_MATCH);
+    }
+
 
     @Override
     public NagatoResponseEntity validateUser(UserLoginDTO user) {
@@ -113,7 +130,7 @@ public class NagatoAccountServiceImpl implements AccountService {
         Integer userNo;
 
         // 参数兜底
-        if (user.getUsername() == null && user.getUuid() == null && user.getPhone() == null ) {
+        if (user.getUsername() == null && user.getUuid() == null && user.getPhone() == null) {
             return new NagatoResponseEntity()
                     .message(ResponseMessage.PARAMETER_NOT_MATCH);
         }
@@ -170,8 +187,9 @@ public class NagatoAccountServiceImpl implements AccountService {
     
     @Override
     public NagatoResponseEntity invalidateUser(String token) {
+        String uuid = (String) redisTemplate.opsForHash().get(RedisKey.ACCESS_TOKEN, token);
         redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN).delete(token);
-
+        redisTemplate.boundHashOps(RedisKey.ACCESS_TOKEN_REVERSE).delete(uuid);
         return new NagatoResponseEntity()
                 .message(ResponseMessage.OK);
     }

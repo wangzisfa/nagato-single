@@ -12,22 +12,37 @@
     </resultMap>
     
     <resultMap id="UserProfileMapper" type="com.github.nagatosingle.entity.NagatoUserProfile">
-        <id property="userNoGenerate" column="user_no_generate"/>
-        <result property="username" column="user_nick"/>
-        <result property="realName" column="user_real_name"/>
-        <result property="gender" column="user_gender"/>
-        <result property="userIcon" column="icon_url"/>
-        <result property="email" column="user_email" />
-        <result property="userSign" column="user_sign"/>
-        <result property="userFaceId" column="user_face_id"/>
-        <result property="userCredit" column="user_credit"/>
-        <result property="isInspector" column="is_inspector"/>
-        <result property="accessPropertyDevice" column="access_property_device"/>
-        <result property="accessPropertyLog" column="access_property_log"/>
-        <result property="accessPropertyUser" column="access_property_user"/>
+        <id property="uuid" column="user_no_generate" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="username" column="user_nick" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="realName" column="user_real_name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="gender" column="user_gender" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userIconURI" column="icon_url" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="email" column="user_email" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userCurrentMood" column="user_current_mood" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userSign" column="user_sign" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userPhone" column="user_phone" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userFaceId" column="user_face_id" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        <result property="userCredit" column="user_credit" javaType="java.lang.Double" jdbcType="DOUBLE"/>
+        <result property="isInspector" column="is_inspector" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result property="accessPropertyDevice" column="access_property_device" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result property="accessPropertyLog" column="access_property_log" javaType="java.lang.Integer" jdbcType="INTEGER"/>
+        <result property="accessPropertyUser" column="access_property_user" javaType="java.lang.Integer" jdbcType="INTEGER"/>
         <result property="userCreate" column="gmt_create"/>
         <result property="userHireDate" column="user_hire_date"/>
     </resultMap>
+
+
+    <select id="findUserProfileByUuid" resultMap="UserProfileMapper">
+        SELECT user_no_generate, user_real_name, user_nick, user_gender, user_hire_date,
+               user_credit, user_face_id, user_phone, user_current_mood, is_inspector,
+               ICON.icon_url, user_sign, user_email, access_property_device, access_property_log, access_property_user, USER.gmt_create
+        FROM nagato_plain_user USER
+                 JOIN nagato_user_icon ICON ON USER.user_no = ICON.user_no
+                 JOIN nagato_user_credit CREDIT ON USER.user_no = CREDIT.user_no
+                 JOIN nagato_user_sign SIGN ON USER.user_no = SIGN.user_no
+                 JOIN nagato_user_email EMAIL ON USER.user_no = EMAIL.user_no
+        WHERE USER.user_no_generate = '4dbc7a6bc02a42c095fff026be8b3fa5';
+    </select>
 
 
     <select id="findAuthUserByUsername" resultMap="AuthUserMapper">
@@ -117,5 +132,25 @@
     <insert id="createUserPassword" parameterType="com.github.nagatosingle.entity.NagatoRegisterProfile">
         insert into nagato_user_password(user_no, user_password)
         values (#{userNo}, #{password});
+    </insert>
+
+    <insert id="createUserIconDefault">
+        insert into nagato_user_icon(user_no, icon_url)
+        values (#{userNo}, #{defaultURL});
+    </insert>
+
+    <insert id="createUserCreditDefault">
+        insert into nagato_user_credit(user_no, user_credit)
+        values (#{userNo}, #{defaultCredit});
+    </insert>
+
+    <insert id="createUserSignDefault">
+        insert into nagato_user_sign(user_no, user_sign)
+        values (#{userNo}, #{defaultSign});
+    </insert>
+
+    <insert id="createUserEmailDefault">
+        insert into nagato_user_email(user_no)
+        values (#{userNo});
     </insert>
 </mapper>

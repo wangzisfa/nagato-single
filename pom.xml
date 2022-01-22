@@ -48,9 +48,10 @@
         <!--            <scope>runtime</scope>-->
         <!--        </dependency>-->
         <dependency>
+            <scope>compile</scope>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <version>1.18.22</version>
         </dependency>
 <!--web security-->
 <!--        <dependency>-->
