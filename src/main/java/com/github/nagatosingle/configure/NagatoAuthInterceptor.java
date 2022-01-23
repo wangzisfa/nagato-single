@@ -69,9 +69,7 @@ public class NagatoAuthInterceptor implements HandlerInterceptor {
 
 			return true;
 		} else {
-//			if (request.getHeader("Authorization") != null)
-//				return tokenService.validateToken(request.getHeader("Authorization"));
-//			else {
+			// 这边有点问题 如果请求参数有问题或者逻辑错误最终都会返回401
 				response.setStatus(401);
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.github.nagatosingle.controller.BaseController.getToken;
 import static com.github.nagatosingle.controller.BaseController.returnStatement;
 
 /**
@@ -39,7 +40,7 @@ public class UserController {
     
     @GetMapping("/profile")
     public ResponseEntity<?> userProfile(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = getToken(request);
         token = token.substring(token.indexOf(" ") + 1);
         String uuid = (String) tokenService.getClaimFromToken(token, claims -> claims.get("id"));
         log.info("userProfile token " + token);

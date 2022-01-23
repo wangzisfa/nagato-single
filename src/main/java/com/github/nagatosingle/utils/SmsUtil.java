@@ -8,9 +8,9 @@ import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
-import com.tencentcloudapi.sms.v20210111.SmsClient;
-import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
-import com.tencentcloudapi.sms.v20210111.models.SendSmsResponse;
+import com.tencentcloudapi.sms.v20190711.SmsClient;
+import com.tencentcloudapi.sms.v20190711.models.SendSmsRequest;
+import com.tencentcloudapi.sms.v20190711.models.SendSmsResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +56,9 @@ public class SmsUtil {
 			String[] phoneNumberSet1 = {number};
 			req.setPhoneNumberSet(phoneNumberSet1);
 
-			req.setSmsSdkAppId(SDK_APPID);
-			req.setSignName(SIGN_NAME);
-			req.setTemplateId(TEMPLATE_ID);
+			req.setSmsSdkAppid(SDK_APPID);
+			req.setSign(SIGN_NAME);
+			req.setTemplateID(TEMPLATE_ID);
 
 			// 生成验证码
 			String verificationCode = randomVerificationCode();

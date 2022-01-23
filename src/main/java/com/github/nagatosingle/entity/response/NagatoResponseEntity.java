@@ -30,7 +30,7 @@ public class NagatoResponseEntity extends HashMap<String, Object> {
     }
     
     public String getMessage() {
-        return String.valueOf(this.get("message"));
+        return this.get("message") != null ? String.valueOf(this.get("message")) : "";
     }
     
     public Object getData() {

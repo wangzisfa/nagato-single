@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.nagatosingle.dao.DeviceMapper">
+    <resultMap id="SelectDeviceDetail" type="com.github.nagatosingle.entity.NagatoDeviceDetail">
+        <id property="deviceUuid" column="device_serial"/>
+        <result property="deviceName" column="device_name"/>
+        <result property="deviceProductionDate" column="device_production_date"/>
+        <result property="deviceManufacturer" column="device_manufacturer"/>
+        <result property="deviceServiceLifeFromDate" column="device_service_life_from_date"/>
+        <result property="deviceServiceLifeToDate" column="device_service_life_to_date"/>
+        <result property="isKeyDevice" column="is_key_device"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="devicePicList" column="pic_url" javaType="java.lang.String"/>
+        <association property="category" javaType="com.github.nagatosingle.entity.NagatoDeviceCategory">
+            <result property="categoryType" column="category_type"/>
+            <result property="categoryName" column="category_name"/>
+            <result property="isKeyDeviceType" column="is_key_device_type"/>
+            <result property="gmtCreate" column="gmt_create"/>
+        </association>
+        <association property="nagatoDeviceInUse" javaType="com.github.nagatosingle.entity.NagatoDeviceInUse">
+            <result property="isInUse" column="is_in_use"/>
+            <result property="isOnLending" column="is_on_lending"/>
+            <result property="userLendingNo" column="user_lending_no"/>
+            <result property="userLendingUuid" column="user_no_generate"/>
+            <result property="deviceNo" column="device_no"/>
+            <result property="deviceUuid" column="device_serial"/>
+            <result property="deviceLendingFromDate" column="device_lending_from_date"/>
+            <result property="deviceLendingToDate" column="device_lending_to_date"/>
+            <result property="gmtCreate" column="gmt_create"/>
+            <association property="nagatoDeviceInUseNotice" javaType="com.github.nagatosingle.entity.NagatoDeviceInUseNotice">
+                <result property="notice" column="device_in_use_notice"/>
+                <result property="gmtCreate" column="gmt_create"/>
+                <result property="deviceUsePositionDetail" column="device_use_position_detail"/>
+                <result property="deviceInUseNoticeNo" column="notice_id"/>
+                <result property="deviceNo" column="device_no"/>
+            </association>
+            <collection property="nagatoDeviceInUseNoticePicList" ofType="com.github.nagatosingle.entity.NagatoDeviceInUseNoticePic">
+                <result property="deviceInUseNoticeNo" column="notice_id"/>
+                <result property="picURI" column="pic_url"/>
+            </collection>
+        </association>
+<!--        <association property="deviceRFID" javaType="com.github.nagatosingle.entity.NagatoDeviceRFID">-->
+<!--            -->
+<!--        </association>-->
+    </resultMap>
+
+
+    <insert id="createNagatoDeviceUser" >
+        insert into nagato_device_user(device_no, user_no, is_in_use,
+                                       is_on_lending, user_lending_no,
+                                       device_lending_from_date,
+                                       device_lending_to_date
+        )
+        values (#{deviceNo}, #{userLendingNo}, #{isInUse}, #{isOnLending},
+                #{userLendingNo}, #{deviceLendingFromDate}, #{deviceLendingToDate})
+    </insert>
+
+    <insert id="createNagatoDeviceInUseNotice" >
+        insert into nagato_device_in_use_notice(device_no, device_in_use_notice,
+                                                device_use_position_detail)
+        values (#{deviceNo}, #{notice}, #{deviceUsePositionDetail})
+    </insert>
+
+    <insert id="createNagatoDeviceInUseNoticePic" >
+
+        <foreach collection="list" item="item" separator=";">
+            insert into nagato_device_in_use_notice_pic_url(notice_id, pic_url)
+            values (#{item.deviceInUseNoticeNo}, #{item.picURI})
+        </foreach>
+    </insert>
+
+    <select id="findDeviceNoByDeviceNoGenerate" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select device_no from nagato_device
+        where device_serial = #{deviceUuid}
+    </select>
+
+    <select id="findDeviceInUseNoticeNoByDeviceNo" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        select id from nagato_device_in_use_notice
+        where device_no = #{deviceNo}
+    </select>
+
+</mapper>

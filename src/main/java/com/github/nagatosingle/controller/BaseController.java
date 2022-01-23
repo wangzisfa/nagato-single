@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 /**
@@ -38,7 +39,17 @@ public class BaseController {
                         new ResponseEntity<>(response, HttpStatus.OK) :
                         new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
-    
+
+    /**
+     * @param request request
+     * @return without Bearer
+     */
+    public static String getToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        token = token.substring(token.indexOf(" ") + 1);
+        System.out.println("wangzisfa " + token);
+        return token;
+    }
     
     @Autowired
     private MessagePublisher messagePublisher;

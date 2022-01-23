@@ -14,5 +14,6 @@ user:
     - "/platform/account/logout"
     - "/platform/device/*"
     - "/platform/user/*"
+    - "/minio/*"
 #  banned:
 #    - "asdfa"

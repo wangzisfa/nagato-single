@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.github.nagatosingle.controller.BaseController.getToken;
 import static com.github.nagatosingle.controller.BaseController.returnStatement;
 
 /**
@@ -84,7 +85,7 @@ public class AccountController {
     
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = getToken(request);
         System.out.println("logout : " + token);
         NagatoResponseEntity response = accountService.invalidateUser(token);
         return returnStatement(response);
